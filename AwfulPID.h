@@ -29,8 +29,8 @@ class AwfulPID {
 	  AwfulPID();
     void setConfig(PIDConfiguration c);
     void setParam(PIDParameters p);
-    void setManual(int mv);
-    int update(byte ctrl, int _PV, int _SP);    
+    void setManual(int _val);
+    int update(byte ctrl, int _iPV, int _iSP);    
     int getError();
     int getCV();
     bool getStability();
@@ -39,11 +39,10 @@ class AwfulPID {
     PIDConfiguration cfg;
     PIDParameters param;
     Debounce cycleTimer;
-    int PV, SP, CV, MV;
+    int iPV, iSP, oCV, iMV;
     int err_last;
     float acc_ki = 0.0;
     bool stable = false;
     int stableCycles = 0;
-
 };
 #endif

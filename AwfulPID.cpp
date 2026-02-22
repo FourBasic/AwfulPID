@@ -15,14 +15,14 @@ void AwfulPID::setParam(PIDParameters p) {
     param = p;
 }
 
-void AwfulPID::setManual(int val) {
-    MV = val;
+void AwfulPID::setManual(int _val) {
+    iMV = _val;
 }
 
-int AwfulPID::update(byte ctrl, int _PV, int _SP) {    
+int AwfulPID::update(byte ctrl, int _iPV, int _iSP) {    
     if (ctrl == PID_INIT) {
         // Clear and PID_INIT
-        CV = cfg.outMn;
+        oCV = cfg.outMn;
         acc_ki = 0;      
         err_last = 0;
         stable = false;
@@ -40,8 +40,8 @@ int AwfulPID::update(byte ctrl, int _PV, int _SP) {
             cycleTimer.resetTransitionFlag();
 
             // Push request to current
-            PV = _PV;
-            SP = _SP;
+            iPV = _iPV;
+            iSP = _iSP;
             
             // Calculations
             int err = calculateError();            
@@ -51,7 +51,7 @@ int AwfulPID::update(byte ctrl, int _PV, int _SP) {
                 term_kp = (int) (param.kp * err); 
                 if (param.ki > 0.00001) { acc_ki = acc_ki + (param.ki * err); }
                 if (param.kd > 0.00001) { term_kd = param.kd * (err - err_last); }
-                CV = term_kp + acc_ki + term_kd;
+                oCV = term_kp + acc_ki + term_kd;
             }
 
             // Monitor stability - Accumulate cycles
@@ -73,16 +73,16 @@ int AwfulPID::update(byte ctrl, int _PV, int _SP) {
     } else if (ctrl == PID_TIEBACK) {
 
     } else if (ctrl == PID_MANUAL) {
-        CV = MV;
+        oCV = iMV;
     }    
-    CV = limit(cfg.outMn, CV, cfg.outMx);
-    return CV;
+    oCV = limit(cfg.outMn, oCV, cfg.outMx);
+    return oCV;
 }
 
 int AwfulPID::calculateError() {
     int e;
-    if (cfg.reverseActing) { e = PV - SP; }
-    else { e = SP - PV; }
+    if (cfg.reverseActing) { e = iPV - iSP; }
+    else { e = iSP - iPV; }
     return e;
 }
 
@@ -91,7 +91,7 @@ int AwfulPID::getError() {
 }
 
 int AwfulPID::getCV() {
-    return CV;
+    return oCV;
 }
 
 bool AwfulPID::getStability() {

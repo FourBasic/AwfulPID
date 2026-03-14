@@ -29,19 +29,19 @@ class AwfulPID {
 	  AwfulPID();
     void setConfig(PIDConfiguration c);
     void setParam(PIDParameters p);
-    void setManual(int _val);
-    int update(byte ctrl, int _iPV, int _iSP);    
-    int getError();
-    int getCV();
+    void setManual(float _val);
+    float update(byte ctrl, float _iPV, float _iSP);    
+    float getError();
+    float getCV();
     bool getStability();
   private:
-    int calculateError();
+    float calculateError();
     PIDConfiguration cfg;
     PIDParameters param;
     Debounce cycleTimer;
-    int iPV, iSP, oCV, iMV;
-    int err_last;
-    float acc_ki = 0.0;
+    float iPV, iSP, oCV, iMV;
+    float err_last;
+    float acc_ki;
     bool stable = false;
     int stableCycles = 0;
 };

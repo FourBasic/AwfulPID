@@ -15,11 +15,11 @@ void AwfulPID::setParam(PIDParameters p) {
     param = p;
 }
 
-void AwfulPID::setManual(int _val) {
+void AwfulPID::setManual(float _val) {
     iMV = _val;
 }
 
-int AwfulPID::update(byte ctrl, int _iPV, int _iSP) {    
+float AwfulPID::update(byte ctrl, float _iPV, float _iSP) {    
     if (ctrl == PID_INIT) {
         // Clear and PID_INIT
         oCV = cfg.outMn;
@@ -44,11 +44,11 @@ int AwfulPID::update(byte ctrl, int _iPV, int _iSP) {
             iSP = _iSP;
             
             // Calculations
-            int err = calculateError();            
+            float err = calculateError();            
             if (err != 0) {
-                int term_kp;
-                int term_kd = 0;
-                term_kp = (int) (param.kp * err); 
+                float term_kp;
+                float term_kd = 0;
+                term_kp = param.kp * err; 
                 if (param.ki > 0.00001) { acc_ki = acc_ki + (param.ki * err); }
                 if (param.kd > 0.00001) { term_kd = param.kd * (err - err_last); }
                 oCV = term_kp + acc_ki + term_kd;
@@ -74,23 +74,24 @@ int AwfulPID::update(byte ctrl, int _iPV, int _iSP) {
 
     } else if (ctrl == PID_MANUAL) {
         oCV = iMV;
-    }    
-    oCV = limit(cfg.outMn, oCV, cfg.outMx);
+    }
+    if (oCV < cfg.outMn) { oCV = cfg.outMn; } 
+    else if (oCV > cfg.outMx) { oCV = cfg.outMx; }
     return oCV;
 }
 
-int AwfulPID::calculateError() {
-    int e;
+float AwfulPID::calculateError() {
+    float e;
     if (cfg.reverseActing) { e = iPV - iSP; }
     else { e = iSP - iPV; }
     return e;
 }
 
-int AwfulPID::getError() {
+float AwfulPID::getError() {
     return err_last;
 }
 
-int AwfulPID::getCV() {
+float AwfulPID::getCV() {
     return oCV;
 }
 

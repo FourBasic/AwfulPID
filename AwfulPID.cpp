@@ -49,7 +49,7 @@ float AwfulPID::update(byte ctrl, float _iPV, float _iSP) {
                 float term_kp;
                 float term_kd = 0;
                 term_kp = param.kp * err; 
-                if (param.ki > 0.00001) { acc_ki = acc_ki + (param.ki * err); }
+                if (param.ki > 0.00001) { acc_ki = (acc_ki + (param.ki * err)) * abs(term_kp); }
                 if (param.kd > 0.00001) { term_kd = param.kd * (err - err_last); }
                 oCV = term_kp + acc_ki + term_kd;
             }
@@ -74,6 +74,7 @@ float AwfulPID::update(byte ctrl, float _iPV, float _iSP) {
 
     } else if (ctrl == PID_MANUAL) {
         oCV = iMV;
+        err_last = calculateError();
     }
     if (oCV < cfg.outMn) { oCV = cfg.outMn; } 
     else if (oCV > cfg.outMx) { oCV = cfg.outMx; }
